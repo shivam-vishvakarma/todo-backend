@@ -65,7 +65,7 @@ jobs:
           script: |
             # Navigate to application directory
             echo "Starting deployment..."
-            echo "Environment: ${{ secrets.SERVER_SSH_KEY.substring(0, 4) }}**** on ${{ secrets.SERVER_HOST }}"
+            echo "Environment: ${{ secrets.SERVER_SSH_KEY }}**** on ${{ secrets.SERVER_HOST }}"
             cd ${{ secrets.APP_PATH || '/var/www/todo' }}/server
 
             # Stop PM2 process
