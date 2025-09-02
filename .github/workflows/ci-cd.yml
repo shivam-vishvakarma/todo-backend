@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   NODE_VERSION: '20'
@@ -64,19 +64,10 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             # Navigate to application directory
-            cd ${{ secrets.APP_PATH || '/var/www/todo-app' }}
-            
+            cd ${{ secrets.APP_PATH || '/var/www/todo' }}/server
+
             # Stop PM2 process
-            pm2 stop todo-app || true
-            
-            # Backup current version
-            if [ -d "current" ]; then
-              rm -rf backup
-              mv current backup
-            fi
-            
-            # Create new directory for deployment
-            mkdir -p current
+            pm2 stop todo-server || true
 
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
@@ -85,8 +76,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
-          source: "deployment.tar.gz"
-          target: ${{ secrets.APP_PATH || '/var/www/todo-app' }}
+          source: 'deployment.tar.gz'
+          target: ${{ secrets.APP_PATH || '/var/www/todo' }}/server
 
       - name: Extract and restart application
         uses: appleboy/ssh-action@v1.0.3
@@ -97,25 +88,25 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             # Navigate to application directory
-            cd ${{ secrets.APP_PATH || '/var/www/todo-app' }}
-            
+            cd ${{ secrets.APP_PATH || '/var/www/todo' }}
+
             # Extract deployment package
             tar -xzf deployment.tar.gz -C server/
-            
-            # Navigate to current directory
-            cd current
-            
+
+            # Navigate to server directory
+            cd server
+
             # Run database migrations if needed
             npx prisma migrate deploy || true
-            
+
             # Start application with PM2
-            pm2 start dist/main.js --name "todo-app" --node-args="--max-old-space-size=1024" || pm2 restart todo-app
-            
+            pm2 start dist/main.js --name "todo-server" -i max || pm2 restart todo-server
+
             # Save PM2 configuration
             pm2 save
-            
+
             # Clean up
             cd ..
             rm -f deployment.tar.gz
-            
+
             echo "Deployment completed successfully!"
