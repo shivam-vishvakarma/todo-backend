@@ -1,98 +1,220 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Todo Application with Authentication & Authorization
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A comprehensive todo application built with NestJS, featuring user authentication, authorization, and admin management capabilities.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+### Authentication & Authorization
+- User registration and login with JWT tokens
+- Password hashing with bcrypt
+- Role-based access control (USER/ADMIN)
+- Passport.js integration with local and JWT strategies
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Todo Management
+- Create, read, update, delete todos
+- Todo status tracking (PENDING, IN_PROGRESS, COMPLETED)
+- Deadline management
+- User-specific todo access with admin override
 
-## Project setup
+### Profile Management
+- View and update user profile
+- Change password functionality
+- Delete user account
 
+### Admin Features
+- View all users and their statistics
+- Manage user accounts (update/delete)
+- View all todos across the system
+- System statistics dashboard
+- User role management
+- Redis cache management and monitoring
+
+### Redis Features
+- **Caching**: Automatic caching of frequently accessed data (users, todos, stats)
+- **Session Management**: User session tracking with Redis
+- **Rate Limiting**: Redis-based rate limiting for API endpoints
+- **Cache Invalidation**: Smart cache invalidation on data changes
+- **Health Monitoring**: Redis connection health checks
+- **Admin Tools**: Cache management and monitoring for administrators
+
+## Tech Stack
+
+- **Framework**: NestJS
+- **Database**: PostgreSQL with Prisma ORM
+- **Cache**: Redis for caching and session management
+- **Authentication**: Passport.js with JWT
+- **Validation**: class-validator & class-transformer
+- **Password Hashing**: bcryptjs
+- **Rate Limiting**: Redis-based rate limiting
+
+## Setup Instructions
+
+### 1. Install Dependencies
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+### 2. Database & Redis Setup
+1. Install PostgreSQL on your system
+2. Install Redis on your system
+3. Create a new database for the application
+4. Update the `DATABASE_URL` and Redis configuration in `.env` file
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+### 3. Environment Configuration
+Update the `.env` file with your configuration:
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/todoapp?schema=public"
+JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+JWT_EXPIRES_IN="7d"
+REDIS_HOST="localhost"
+REDIS_PORT=6379
+REDIS_PASSWORD=""
+REDIS_DB=0
+PORT=3000
+NODE_ENV="development"
 ```
 
-## Run tests
-
+### 4. Database Migration
 ```bash
-# unit tests
-$ npm run test
+# Generate Prisma client
+npx prisma generate
 
-# e2e tests
-$ npm run test:e2e
+# Run database migrations
+npx prisma db push
 
-# test coverage
-$ npm run test:cov
+# (Optional) Seed the database
+npx prisma db seed
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### 5. Run the Application
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Development mode
+npm run start:dev
+
+# Production mode
+npm run start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## API Endpoints
 
-## Resources
+### Authentication
+- `POST /auth/register` - Register a new user
+- `POST /auth/login` - Login user
+- `POST /auth/logout` - Logout user (requires authentication)
 
-Check out a few resources that may come in handy when working with NestJS:
+### Profile Management
+- `GET /profile` - Get current user profile
+- `PATCH /profile` - Update user profile
+- `PATCH /profile/password` - Change password
+- `DELETE /profile` - Delete user account
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Todo Management
+- `GET /todos` - Get user's todos (admin sees all)
+- `POST /todos` - Create new todo
+- `GET /todos/:id` - Get specific todo
+- `PATCH /todos/:id` - Update todo
+- `DELETE /todos/:id` - Delete todo
+- `GET /todos/user/:userId` - Get todos by user ID
 
-## Support
+### Admin Routes (Admin only)
+- `GET /admin/users` - Get all users
+- `GET /admin/users/:id` - Get user by ID
+- `PATCH /admin/users/:id` - Update user
+- `DELETE /admin/users/:id` - Delete user
+- `GET /admin/todos` - Get all todos
+- `GET /admin/stats` - Get system statistics
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Redis Management (Admin only)
+- `GET /admin/redis/info` - Get Redis server information
+- `GET /admin/redis/keys/:pattern` - Get Redis keys by pattern
+- `DELETE /admin/redis/cache/all` - Clear all cache
+- `DELETE /admin/redis/cache/user/:userId` - Clear user-specific cache
+- `DELETE /admin/redis/cache/todos` - Clear todos cache
+- `DELETE /admin/redis/cache/users` - Clear users cache
+- `DELETE /admin/redis/cache/stats` - Clear system stats cache
+- `POST /admin/redis/cache/warm` - Warm up cache
 
-## Stay in touch
+### Health Check
+- `GET /health` - Check application and services health
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Database Schema
+
+### User Model
+- `id`: Unique identifier
+- `email`: User email (unique)
+- `username`: Username (unique)
+- `password`: Hashed password
+- `firstName`: Optional first name
+- `lastName`: Optional last name
+- `role`: USER or ADMIN
+- `createdAt`: Creation timestamp
+- `updatedAt`: Last update timestamp
+
+### Todo Model
+- `id`: Unique identifier
+- `title`: Todo title
+- `description`: Optional description
+- `status`: PENDING, IN_PROGRESS, or COMPLETED
+- `deadline`: Optional deadline
+- `userId`: Reference to user
+- `createdAt`: Creation timestamp
+- `updatedAt`: Last update timestamp
+
+## Authorization Rules
+
+### Users
+- Can only access their own todos and profile
+- Cannot access admin routes
+- Cannot modify other users' data
+
+### Admins
+- Can access all todos and user profiles
+- Can manage user accounts
+- Can view system statistics
+- Have full CRUD access to all resources
+
+## Security Features
+
+- JWT token-based authentication
+- Password hashing with bcrypt (12 rounds)
+- Input validation and sanitization
+- Role-based access control
+- Protected routes with guards
+- Redis-based rate limiting
+- Session management with Redis
+- CORS enabled for cross-origin requests
+
+## Development
+
+### Running Tests
+```bash
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
+```
+
+### Code Quality
+```bash
+# Linting
+npm run lint
+
+# Formatting
+npm run format
+```
+
+## Production Deployment
+
+1. Set `NODE_ENV=production` in your environment
+2. Update `JWT_SECRET` with a strong, unique secret
+3. Configure your production database
+4. Build the application: `npm run build`
+5. Start with: `npm run start:prod`
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is licensed under the MIT License.
