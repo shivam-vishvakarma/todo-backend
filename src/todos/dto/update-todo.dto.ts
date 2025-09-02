@@ -1,5 +1,5 @@
-import { TodoStatus } from '@prisma/client';
 import { IsOptional, IsString, IsDateString, IsEnum } from 'class-validator';
+import { TodoStatus } from 'generated/prisma';
 
 export class UpdateTodoDto {
   @IsString()

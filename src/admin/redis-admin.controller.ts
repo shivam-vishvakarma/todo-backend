@@ -1,10 +1,17 @@
-import { Controller, Get, Delete, Param, UseGuards, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Delete,
+  Param,
+  UseGuards,
+  Post,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CacheService } from '../cache/cache.service';
 import { RedisService } from '../redis/redis.service';
-import { Role } from '@prisma/client';
+import { Role } from 'generated/prisma';
 
 @Controller('admin/redis')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -20,7 +27,7 @@ export class RedisAdminController {
     const client = this.redisService.getClient();
     const info = await client.info();
     const dbSize = await client.dbSize();
-    
+
     return {
       info: this.parseRedisInfo(info),
       dbSize,
@@ -77,19 +84,21 @@ export class RedisAdminController {
   private parseRedisInfo(info: string): Record<string, any> {
     const sections: Record<string, any> = {};
     let currentSection = 'general';
-    
-    info.split('\r\n').forEach(line => {
+
+    info.split('\r\n').forEach((line) => {
       if (line.startsWith('#')) {
         currentSection = line.substring(2).toLowerCase();
         sections[currentSection] = {};
       } else if (line.includes(':')) {
         const [key, value] = line.split(':');
         if (sections[currentSection]) {
-          sections[currentSection][key] = isNaN(Number(value)) ? value : Number(value);
+          sections[currentSection][key] = isNaN(Number(value))
+            ? value
+            : Number(value);
         }
       }
     });
-    
+
     return sections;
   }
 }

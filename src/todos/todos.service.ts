@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CacheService } from '../cache/cache.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { Role } from '@prisma/client';
+import { Role } from 'generated/prisma';
 
 @Injectable()
 export class TodosService {
@@ -55,7 +59,7 @@ export class TodosService {
 
     // Admin can see all todos, users can only see their own
     const where = userRole === Role.ADMIN ? {} : { userId };
-    
+
     const todos = await this.prisma.todo.findMany({
       where,
       include: {
@@ -108,9 +112,14 @@ export class TodosService {
     return todo;
   }
 
-  async update(id: number, updateTodoDto: UpdateTodoDto, userId: number, userRole: Role) {
+  async update(
+    id: number,
+    updateTodoDto: UpdateTodoDto,
+    userId: number,
+    userRole: Role,
+  ) {
     const todo = await this.findOne(id, userId, userRole);
-    
+
     const { deadline, ...rest } = updateTodoDto;
     const updatedTodo = await this.prisma.todo.update({
       where: { id },
@@ -139,7 +148,7 @@ export class TodosService {
 
   async remove(id: number, userId: number, userRole: Role) {
     const todo = await this.findOne(id, userId, userRole);
-    
+
     const deletedTodo = await this.prisma.todo.delete({
       where: { id },
     });
@@ -152,7 +161,11 @@ export class TodosService {
     return deletedTodo;
   }
 
-  async findByUser(targetUserId: number, currentUserId: number, currentUserRole: Role) {
+  async findByUser(
+    targetUserId: number,
+    currentUserId: number,
+    currentUserRole: Role,
+  ) {
     // Admin can see any user's todos, users can only see their own
     if (currentUserRole !== Role.ADMIN && targetUserId !== currentUserId) {
       throw new ForbiddenException('Access denied');

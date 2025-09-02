@@ -16,7 +16,7 @@ import { RateLimitGuard } from '../rate-limit/guards/rate-limit.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RateLimit } from '../rate-limit/decorators/rate-limit.decorator';
 import { RateLimitService } from '../rate-limit/rate-limit.service';
-import { Role } from '@prisma/client';
+import { Role } from 'generated/prisma';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard, RateLimitGuard)
